@@ -1,3 +1,7 @@
+import be.tarsos.dsp.*;
+import be.tarsos.dsp.io.jvm.*;
+
+
 class SoundGenerator implements Runnable {
     private int samplingRate = 44100; // Number of samples used for 1 second of sound
     private int nyquistFrequency = samplingRate / 2; // Nyquist frequency
@@ -402,20 +406,55 @@ class SoundGenerator implements Runnable {
 
     // You can add your own sound if you want to
     private void generateSound23(float amplitude, float frequency, float duration) {
-        generateSound(1, amplitude, frequency, duration);
-        float[] samplesA = new float[soundSamples.leftChannelSamples.length];
-        for (int i = 0; i < samplesA.length; i++) {
-           samplesA[i] = soundSamples.leftChannelSamples[i];
-        }
+        WavFileReader reader = new WavFileReader("../chickenband/src/sounds/C1.wav");
+        final float[] samples = reader.getData();
         
-        generateSound(14, amplitude / 10, 4 * frequency, duration);
-        for (int i = 0; i < samplesA.length; i++) {
-           float sampleValue = samplesA[i] + soundSamples.leftChannelSamples[i];
-           soundSamples.leftChannelSamples[i] = sampleValue;
-           soundSamples.rightChannelSamples[i] = soundSamples.leftChannelSamples[i];
-        }
+        float d1 = samplingRate;
+        float d2 = 3.0; // Factor
         
-        soundSamples.postprocessEffect(2, 7, amplitude, 0);
+        RateTransposer localRateTransposer = new RateTransposer(d2);
+        WaveformSimilarityBasedOverlapAdd localWaveformSimilarityBasedOverlapAdd = new WaveformSimilarityBasedOverlapAdd(WaveformSimilarityBasedOverlapAdd.Parameters.musicDefaults(d2, d1));
+   //     WaveformWriter localWaveformWriter = new WaveformWriter(localAudioFormat, paramString2);
+        AudioEvent event = new AudioEvent(new TarsosDSPAudioFormat(samplingRate, 16, 1, true, false));
+        event.setFloatBuffer(samples);
+        
+        try {
+            AudioDispatcher localAudioDispatcher;
+            localAudioDispatcher = be.tarsos.dsp.io.jvm.AudioDispatcherFactory.fromFloatArray(samples, samplingRate, localWaveformSimilarityBasedOverlapAdd.getInputBufferSize(), localWaveformSimilarityBasedOverlapAdd.getOverlap());
+            println(samples.length + " input size");
+            println(localAudioDispatcher.getFormat().toString());
+            //localWaveformSimilarityBasedOverlapAdd.process(event);
+            //localRateTransposer.process(event);
+            localAudioDispatcher.addAudioProcessor(localWaveformSimilarityBasedOverlapAdd);
+            localAudioDispatcher.addAudioProcessor(localRateTransposer);
+            localAudioDispatcher.addAudioProcessor(new AudioProcessor() {
+                int count = 0;
+                float[] results = new float[samples.length];
+                @Override
+                public boolean process(AudioEvent event) {
+                    float[] eventResults = event.getFloatBuffer();
+                    System.arraycopy(eventResults, 0, results, count, eventResults.length);
+                    count += eventResults.length;
+                    return true;
+                }
+                
+                @Override
+                 public void processingFinished() {
+                   println("Processing complete");
+                   
+                    soundSamples.leftChannelSamples = results;
+                    soundSamples.rightChannelSamples = results;
+                 }
+            });
+            Thread thread = new Thread(localAudioDispatcher);
+            thread.start();
+            thread.join();
+                    
+        } catch (javax.sound.sampled.UnsupportedAudioFileException e) {
+            println(e.toString());
+        } catch (InterruptedException e) {
+           println(e.toString()); 
+        }
     }
 
     // You can add your own sound if you want to
