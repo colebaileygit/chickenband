@@ -74,6 +74,70 @@ class SoundGenerator implements Runnable {
     public AudioSamples getGeneratedSound() {
         return soundSamples;
     }
+    
+    
+    public AudioSamples generateSound(String filepath, final float amplitude, float factor, float duration) {
+        WavFileReader reader = new WavFileReader(filepath);
+        final float[] samples = reader.getData();
+        
+        float d1 = samplingRate;
+        float d2 = factor; // Factor
+        if (d2 < 0.1f) d2 = 0.1f;
+        if (d2 > 4.0f) d2 = 4.0f;
+        
+        RateTransposer localRateTransposer = new RateTransposer(d2);
+        WaveformSimilarityBasedOverlapAdd localWaveformSimilarityBasedOverlapAdd = new WaveformSimilarityBasedOverlapAdd(WaveformSimilarityBasedOverlapAdd.Parameters.musicDefaults(d2, d1));
+   //     WaveformWriter localWaveformWriter = new WaveformWriter(localAudioFormat, paramString2);
+        AudioEvent event = new AudioEvent(new TarsosDSPAudioFormat(samplingRate, 16, 1, true, false));
+        event.setFloatBuffer(samples);
+        
+        try {
+            AudioDispatcher localAudioDispatcher;
+            localAudioDispatcher = be.tarsos.dsp.io.jvm.AudioDispatcherFactory.fromFloatArray(samples, samplingRate, localWaveformSimilarityBasedOverlapAdd.getInputBufferSize(), localWaveformSimilarityBasedOverlapAdd.getOverlap());
+            println(samples.length + " input size");
+            println(localAudioDispatcher.getFormat().toString());
+            //localWaveformSimilarityBasedOverlapAdd.process(event);
+            //localRateTransposer.process(event);
+            localAudioDispatcher.addAudioProcessor(localWaveformSimilarityBasedOverlapAdd);
+            localAudioDispatcher.addAudioProcessor(localRateTransposer);
+            localAudioDispatcher.addAudioProcessor(new AudioProcessor() {
+                int count = 0;
+                float[] results = new float[2 * samples.length];
+                @Override
+                public boolean process(AudioEvent event) {
+                    float[] eventResults = event.getFloatBuffer();
+                    System.arraycopy(eventResults, 0, results, count, eventResults.length);
+                    count += eventResults.length;
+                    return true;
+                }
+                
+                @Override
+                 public void processingFinished() {
+                   println("Processing complete");
+                    float[] finalResults = new float[count];
+                    System.arraycopy(results, 0, finalResults, 0, count);
+                    soundSamples.leftChannelSamples = new float[finalResults.length];
+                    soundSamples.rightChannelSamples = new float[finalResults.length];
+                    
+                    for (int i = 0; i < finalResults.length; i++) {
+                       soundSamples.leftChannelSamples[i] = amplitude * finalResults[i]; 
+                       soundSamples.rightChannelSamples[i] = amplitude * finalResults[i];
+                    }
+                 }
+            });
+            Thread thread = new Thread(localAudioDispatcher);
+            thread.start();
+            thread.join();
+                    
+        } catch (javax.sound.sampled.UnsupportedAudioFileException e) {
+            println(e.toString());
+        } catch (InterruptedException e) {
+           println(e.toString()); 
+        }
+        
+        return soundSamples;
+    }
+    
 
     // This function generates an individual sound, using the paramters passed into the constructor
     public AudioSamples generateSound() {
@@ -404,58 +468,6 @@ class SoundGenerator implements Runnable {
         soundSamples.postprocessEffect(2, 7, amplitude, 0);
     }
 
-    // You can add your own sound if you want to
-    private void generateSound23(float amplitude, float frequency, float duration) {
-        WavFileReader reader = new WavFileReader("../chickenband/src/sounds/C1.wav");
-        final float[] samples = reader.getData();
-        
-        float d1 = samplingRate;
-        float d2 = 3.0; // Factor
-        
-        RateTransposer localRateTransposer = new RateTransposer(d2);
-        WaveformSimilarityBasedOverlapAdd localWaveformSimilarityBasedOverlapAdd = new WaveformSimilarityBasedOverlapAdd(WaveformSimilarityBasedOverlapAdd.Parameters.musicDefaults(d2, d1));
-   //     WaveformWriter localWaveformWriter = new WaveformWriter(localAudioFormat, paramString2);
-        AudioEvent event = new AudioEvent(new TarsosDSPAudioFormat(samplingRate, 16, 1, true, false));
-        event.setFloatBuffer(samples);
-        
-        try {
-            AudioDispatcher localAudioDispatcher;
-            localAudioDispatcher = be.tarsos.dsp.io.jvm.AudioDispatcherFactory.fromFloatArray(samples, samplingRate, localWaveformSimilarityBasedOverlapAdd.getInputBufferSize(), localWaveformSimilarityBasedOverlapAdd.getOverlap());
-            println(samples.length + " input size");
-            println(localAudioDispatcher.getFormat().toString());
-            //localWaveformSimilarityBasedOverlapAdd.process(event);
-            //localRateTransposer.process(event);
-            localAudioDispatcher.addAudioProcessor(localWaveformSimilarityBasedOverlapAdd);
-            localAudioDispatcher.addAudioProcessor(localRateTransposer);
-            localAudioDispatcher.addAudioProcessor(new AudioProcessor() {
-                int count = 0;
-                float[] results = new float[samples.length];
-                @Override
-                public boolean process(AudioEvent event) {
-                    float[] eventResults = event.getFloatBuffer();
-                    System.arraycopy(eventResults, 0, results, count, eventResults.length);
-                    count += eventResults.length;
-                    return true;
-                }
-                
-                @Override
-                 public void processingFinished() {
-                   println("Processing complete");
-                   
-                    soundSamples.leftChannelSamples = results;
-                    soundSamples.rightChannelSamples = results;
-                 }
-            });
-            Thread thread = new Thread(localAudioDispatcher);
-            thread.start();
-            thread.join();
-                    
-        } catch (javax.sound.sampled.UnsupportedAudioFileException e) {
-            println(e.toString());
-        } catch (InterruptedException e) {
-           println(e.toString()); 
-        }
-    }
 
     // You can add your own sound if you want to
     private void generateSound24(float amplitude, float frequency, float duration) {
@@ -488,6 +500,70 @@ class SoundGenerator implements Runnable {
 
         }
     }
+    
+    // You can add your own sound if you want to
+    private void generateSound23(final float amplitude, float frequency, float duration) {
+        WavFileReader reader = new WavFileReader("../chickenband/src/sounds/C1.wav");
+        final float[] samples = reader.getData();
+        
+        float d1 = samplingRate;
+        float d2 = 1056 / frequency; // Factor
+        
+        if (d2 < 0.1) d2 = 0.1f;
+        if (d2 > 4.0) d2 = 4.0f;
+        
+        RateTransposer localRateTransposer = new RateTransposer(d2);
+        WaveformSimilarityBasedOverlapAdd localWaveformSimilarityBasedOverlapAdd = new WaveformSimilarityBasedOverlapAdd(WaveformSimilarityBasedOverlapAdd.Parameters.musicDefaults(d2, d1));
+   //     WaveformWriter localWaveformWriter = new WaveformWriter(localAudioFormat, paramString2);
+        AudioEvent event = new AudioEvent(new TarsosDSPAudioFormat(samplingRate, 16, 1, true, false));
+        event.setFloatBuffer(samples);
+        
+        try {
+            AudioDispatcher localAudioDispatcher;
+            localAudioDispatcher = be.tarsos.dsp.io.jvm.AudioDispatcherFactory.fromFloatArray(samples, samplingRate, localWaveformSimilarityBasedOverlapAdd.getInputBufferSize(), localWaveformSimilarityBasedOverlapAdd.getOverlap());
+            println(samples.length + " input size");
+            println(localAudioDispatcher.getFormat().toString());
+            //localWaveformSimilarityBasedOverlapAdd.process(event);
+            //localRateTransposer.process(event);
+            localAudioDispatcher.addAudioProcessor(localWaveformSimilarityBasedOverlapAdd);
+            localAudioDispatcher.addAudioProcessor(localRateTransposer);
+            localAudioDispatcher.addAudioProcessor(new AudioProcessor() {
+                int count = 0;
+                float[] results = new float[2 * samples.length];
+                @Override
+                public boolean process(AudioEvent event) {
+                    float[] eventResults = event.getFloatBuffer();
+                    System.arraycopy(eventResults, 0, results, count, eventResults.length);
+                    println("Current count is " + count + " - " + (count + eventResults.length) + " of " + results.length);
+                    count += eventResults.length;
+                    return true;
+                }
+                
+                @Override
+                 public void processingFinished() {
+                   println("Processing complete");
+                    float[] finalResults = new float[count];
+                    System.arraycopy(results, 0, finalResults, 0, count);
+                    soundSamples.leftChannelSamples = new float[finalResults.length];
+                    soundSamples.rightChannelSamples = new float[finalResults.length];
+                    
+                    for (int i = 0; i < finalResults.length; i++) {
+                       soundSamples.leftChannelSamples[i] = amplitude * finalResults[i]; 
+                       soundSamples.rightChannelSamples[i] = amplitude * finalResults[i];
+                    }
+                 }
+            });
+            Thread thread = new Thread(localAudioDispatcher);
+            thread.start();
+            thread.join();
+                    
+        } catch (javax.sound.sampled.UnsupportedAudioFileException e) {
+            println(e.toString());
+        } catch (InterruptedException e) {
+           println(e.toString()); 
+        }
+    }
+    
     
     // This function convert MIDI pitch to frequency
     private boolean compareToMIDIPitch(int MIDIPitch, float frequency) {
