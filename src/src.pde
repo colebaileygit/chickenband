@@ -77,7 +77,7 @@ int totalSoundNeedToBeGenerated = 19; // Total number of individual sounds that 
         (18) sound 4 multiply with sound 4
         (19) sound 5 multiply with sound 6
 ***/
-int sound = 2; // Say which sound you want to generate in the range 1-24, see list above
+Sound sound = new Sound(1);
 
 /***
     Post-processing of an individual sound:
@@ -324,7 +324,7 @@ void setup() {
         t.getCaptionLabel().setFont(createFont("Arial", 14, true));
     }
 
-    soundSelectionRadioButton.activate(sound - 1);
+    soundSelectionRadioButton.activate(sound.getId() - 1);
 
     for(int i = 0; i < postprocesses.length; ++i) {
         postprocessSelectionRadioButton[i] = cp5.addRadioButton("postprocessSelectionRadioButton" + str(i))
@@ -473,7 +473,7 @@ void setup() {
 void updateSoundInfo() {
     String result = "";
 
-    switch(sound) {
+    switch(sound.getId()) {
         case 1: result = "Sine (Time Domain Method)"; break;
         case 2: result = "Square (Time Domain Method)"; break;
         case 3: result = "Square (Additive Synthesis)"; break;
@@ -573,7 +573,7 @@ void controlEvent(ControlEvent theEvent) {
         soundGenerator.setFrequency(frequency);
         individualSoundWritten = false;
     } else if (theEvent.isFrom(soundSelectionRadioButton)) {
-        sound = int(theEvent.getGroup().getValue());
+        sound = new Sound(int(theEvent.getGroup().getValue()));
         soundGenerator.setSound(sound);
         updateSoundInfo();
         individualSoundWritten = false;
@@ -826,7 +826,7 @@ void generateSoundSequence() {
 
     int totalSounds = 19;
     for (int i = 1; i <= totalSounds; i++) {
-        soundGenerator.generateSound(i, 1.0, 256, singleSoundDuration);
+        soundGenerator.generateSound(new Sound(i), 1.0, 256, singleSoundDuration);
         AudioSamples samples = soundGenerator.getGeneratedSound();
         samples.applyPostProcessing(2); // Post-Process the sound (2 = exponential decay)
         samples.applyPostProcessing(7); // Post-Process the sound (7 = boost)
@@ -863,17 +863,21 @@ public void generateMusic(File selection) {
         writingMusic = true; // So other things don't interrupt the process
 
         String filePath = selection.getAbsolutePath();
-
-        int[] sounds = {0, 24, 12, 0, 1, 0, 8, 0, 10, 0, 0, 0, 0, 0, 0, 0};
+        Sound[] sounds = new Sound[16];
+        for (int i = 0; i < sounds.length; i++) {
+           sounds[i] = null; 
+        }
+        sounds[4] = new Sound(1);
+   //     int[] sounds = {0, 24, 12, 0, 1, 0, 8, 0, 10, 0, 0, 0, 0, 0, 0, 0};
    //     int[] sounds = {0, 24,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        float[] vols = {0, 1.3,  1, 0.3, 0.4, 0, 0.3, 0, 0.3, 0, 0, 0, 0, 0, 0, 0};
+        //float[] vols = {0, 1.3,  1, 0.3, 0.4, 0, 0.3, 0, 0.3, 0, 0, 0, 0, 0, 0, 0};
         
-        int[][] pps = {
-            {2, 0, 7}, {5, 10}, {5, 10, 2}, {5, 10, 2, 8}, {5, 10, 2}, {2, 0, 7},
-            {5, 10, 2, 4}, {2, 0, 7}, {5, 10, 2, 9}, {2, 0, 7}, {2, 0, 7}, {2, 0, 7},
-            {2, 0, 7}, {2, 0, 7}, {2, 0, 7}, {2, 0, 7}
-        };
-        float[] stereoPositions = {0.5, 0.55, 0.45, 0.2, 0.4, 0.5, 0.5, 0.5, 0.6, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5};
+        //int[][] pps = {
+        //    {2, 0, 7}, {5, 10}, {5, 10, 2}, {5, 10, 2, 8}, {5, 10, 2}, {2, 0, 7},
+        //    {5, 10, 2, 4}, {2, 0, 7}, {5, 10, 2, 9}, {2, 0, 7}, {2, 0, 7}, {2, 0, 7},
+        //    {2, 0, 7}, {2, 0, 7}, {2, 0, 7}, {2, 0, 7}
+        //};
+        //float[] stereoPositions = {0.5, 0.55, 0.45, 0.2, 0.4, 0.5, 0.5, 0.5, 0.6, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5};
 
         int startTime = 0; // Where to begin (in seconds)
         int endTime = 260; // Where to end (in seconds)
@@ -910,7 +914,7 @@ public void generateMusic(File selection) {
             }
 
             // Create a new MusicGenerator
-            MusicGenerator musicGenerator = new MusicGenerator(MIDISequence.getTracks(), sounds, vols, pps, stereoPositions, startTime, endTime, tickDuration, samplingRate);
+            MusicGenerator musicGenerator = new MusicGenerator(MIDISequence.getTracks(), sounds, startTime, endTime, tickDuration, samplingRate);
             Thread thread = new Thread(musicGenerator);
             thread.start();
             thread.join();

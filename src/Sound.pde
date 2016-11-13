@@ -3,6 +3,7 @@ class Sound {
     private int[] ppEffects;
     private float fundamentalFrequency;
     private float relativeVolume;
+    private float stereoPosition;
     private String filepath;
     
     public Sound(int id) {
@@ -10,16 +11,21 @@ class Sound {
     }
     
     public Sound(int id, float vol) {
-       this(id, SoundDataMappings.postprocessingMapping(id), 
-       SoundDataMappings.frequencyMapping(id), vol, 
-       SoundDataMappings.filepathMapping(id));
+        this(id, vol, 0.5);
     }
     
-    public Sound(int id, int[] ppEffects, float freq, float vol, String path) {
+    public Sound(int id, float vol, float stereoPosition) {
+        this(id, SoundDataMappings.postprocessingMapping(id), 
+             SoundDataMappings.frequencyMapping(id), vol, stereoPosition,
+             SoundDataMappings.filepathMapping(id));
+    }
+    
+    public Sound(int id, int[] ppEffects, float freq, float vol, float stereoPosition, String path) {
        this.id = id;
        this.ppEffects = ppEffects;
        this.fundamentalFrequency = freq;
        this.relativeVolume = vol;
+       this.stereoPosition = stereoPosition;
        this.filepath = path;
     }
     
@@ -27,6 +33,7 @@ class Sound {
     public int[] getPostProcessingEffects() { return ppEffects; }
     public float getFundamentalFrequency() { return fundamentalFrequency; }
     public float getRelativeVolume() { return relativeVolume; }
+    public float getStereoPosition() { return stereoPosition; }
     public String getFilepath() { return filepath; }
     public float getFactor(float desiredFrequency) {
        return fundamentalFrequency / desiredFrequency; 

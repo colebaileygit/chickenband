@@ -7,7 +7,7 @@ class SoundGenerator implements Runnable {
     private int nyquistFrequency = samplingRate / 2; // Nyquist frequency
 
     private AudioSamples soundSamples;   // the sound samples (two channels)
-    private int sound;
+    private Sound sound;
     private float amplitude = 1.0;
     private float frequency = 256;
     private float duration = 5;  // the duration of the sound to be generated (in seconds)
@@ -16,7 +16,7 @@ class SoundGenerator implements Runnable {
     private float maxValue = 1.0;
 
     // Constructors
-    SoundGenerator(int sound, float amplitude, float frequency, float duration, int samplingRate) {
+    SoundGenerator(Sound sound, float amplitude, float frequency, float duration, int samplingRate) {
         this.samplingRate = samplingRate;
         this.nyquistFrequency = samplingRate / 2;
         this.sound = sound;
@@ -26,7 +26,7 @@ class SoundGenerator implements Runnable {
         soundSamples = new AudioSamples(duration, samplingRate);
     }
 
-    SoundGenerator(int sound, float amplitude, float frequency, float duration) {
+    SoundGenerator(Sound sound, float amplitude, float frequency, float duration) {
         this.sound = sound;
         this.amplitude = amplitude;
         this.frequency = frequency;
@@ -34,7 +34,7 @@ class SoundGenerator implements Runnable {
         soundSamples = new AudioSamples(duration, samplingRate);
     }
 
-    SoundGenerator(int sound, float amplitude, float frequency) {
+    SoundGenerator(Sound sound, float amplitude, float frequency) {
         this.sound = sound;
         this.amplitude = amplitude;
         this.frequency = frequency;
@@ -43,15 +43,15 @@ class SoundGenerator implements Runnable {
 
     // This function is called when using thread
     public void run() {
-        generateSound(sound, amplitude, frequency, duration);
+        generateSound(sound.getFilepath(), amplitude, sound.getFactor(frequency), duration);
     }
 
     // Setter and getter
-    public void setSound(int sound) {
+    public void setSound(Sound sound) {
         this.sound = sound;
     }
 
-    public int getSound() {
+    public Sound getSound() {
         return sound;
     }
 
@@ -141,14 +141,18 @@ class SoundGenerator implements Runnable {
 
     // This function generates an individual sound, using the paramters passed into the constructor
     public AudioSamples generateSound() {
-        return this.generateSound(sound, amplitude, frequency, duration);
+        return this.generateSound(sound.getFilepath(), amplitude, sound.getFactor(frequency), duration);
     }
 
-    public AudioSamples generateSound(int sound, float amplitude, float frequency) {
-        return this.generateSound(sound, amplitude, frequency, duration);
+    public AudioSamples generateSound(Sound sound, float amplitude, float frequency) {
+        return this.generateSound(sound.getFilepath(), amplitude, sound.getFactor(frequency), duration);
+    }
+    
+    public AudioSamples generateSound(Sound sound, float amplitude, float frequency, float duration) {
+       return this.generateSound(sound.getFilepath(), amplitude, sound.getFactor(frequency), duration); 
     }
 
-    // This function generates an individual sound
+    //// This function generates an individual sound
     public AudioSamples generateSound(int sound, float amplitude, float frequency, float duration) {
         // Reset audio samples before generating audio
         soundSamples.clear();
