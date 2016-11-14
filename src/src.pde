@@ -862,6 +862,7 @@ public void generateMusic(File selection) {
     if (selection != null) {
         writingMusic = true; // So other things don't interrupt the process
 
+        // create array of sounds for the selected file here.
         String filePath = selection.getAbsolutePath();
         Sound[] sounds = new Sound[16];
         for (int i = 0; i < sounds.length; i++) {

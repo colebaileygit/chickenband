@@ -41,6 +41,7 @@ class Sound {
      
 }
 
+// add relevant metadata for each sound 'int' here.
 static class SoundDataMappings {
    public static int[] postprocessingMapping(int id) {
        return new int[] { 0 }; 

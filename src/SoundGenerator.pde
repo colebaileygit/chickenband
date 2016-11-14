@@ -78,7 +78,12 @@ class SoundGenerator implements Runnable {
     
     public AudioSamples generateSound(String filepath, final float amplitude, float factor, float duration) {
         WavFileReader reader = new WavFileReader(filepath);
-        final float[] samples = reader.getData();
+        final float[] data = reader.getData();
+        
+        // simply reduce sound to required duration (maybe use time shifting in the future..)
+        int totalSamples = int(samplingRate * duration);
+        final float[] samples = new float[totalSamples];
+        System.arraycopy(data, 0, samples, 0, samples.length);
         
         float d1 = samplingRate;
         float d2 = factor; // Factor
