@@ -134,7 +134,7 @@ int[] postprocesses = {2, 1, 1, 7};   // Which post-Processing you want, see lis
             - This is repeatedly executed many times each second. You don't need to change it.
 ***/
 
-boolean showDebugMessages = true; // Change this to true when you are developing, and false before you submit your assignment
+boolean showDebugMessages = false; // Change this to true when you are developing, and false before you submit your assignment
 
 int samplingRate = 44100; // Number of samples used for 1 second of sound (fixed, don't change)
 float nyquistFrequency = samplingRate / 2.0;
@@ -427,6 +427,24 @@ void setup() {
         }
     })
     .getCaptionLabel().toUpperCase(false).setColor(0).setFont(createFont("Arial", 16, true)).align(ControlP5.CENTER, ControlP5.CENTER);
+
+    // Create a button and put it near the right-Bottom corner
+    cp5.addButton(cp5, "getMidiChannelsInfo", "Select Midi, convert it", 1)
+    .setPosition(width - 320, lowerBound + gapPlot + 4.5 * gapControls)
+    .setSize(300, 30)
+    .setColorBackground(normal)
+    .setColorForeground(highlighted)
+    .setColorActive(highlighted)
+    .addCallback(new CallbackListener() {
+        public void controlEvent(CallbackEvent theEvent) {
+            if(writingSingleSound || writingSoundSequence || writingMusic) return;
+            if(theEvent.getAction() == ControlP5.ACTION_RELEASED) {
+                selectInput("Select a music file:", "getMidiChannelsInfo");
+            }
+        }
+    })
+    .getCaptionLabel().toUpperCase(false).setColor(0).setFont(createFont("Arial", 16, true)).align(ControlP5.CENTER, ControlP5.CENTER);
+
 
     // Zoom In
     zoomInButton = cp5.addButton(cp5, "zoomIn", "-", 4)
@@ -922,6 +940,93 @@ public void generateMusic(File selection) {
 
             int generatingDuration = millis() - generatingStartTime;
             println("Generated the music in " + generatingDuration / 1000.0 + "s");
+
+            // After all the notes have been added at the correct starting times
+            if(showDebugMessages) {
+                println(">>>  Applying echo to the music sequence...");
+            }
+
+            // Add echo to the entire music
+            musicSamples.applyPostProcessing(2, 9, .01, .25);
+            musicSamples.applyPostProcessing(2, 9, .01, .25);
+
+            // You should consider using the 'boost' algorithm before/after applying the echo
+            if(showDebugMessages) {
+                println(">>>  Applying boost to the music sequence to fix clippings...");
+            }
+
+            // Lets boost the whole thing, so no clipping anywhere
+            musicSamples.applyPostProcessing(2, 7, 1.0, Float.NaN);
+
+            if(showDebugMessages) {
+                println(">>>  Finished boosting the music sequence...");
+            }
+
+            // Save the sound samples to a WAV file
+            WAVFileWriter fw = new WAVFileWriter("allmusic.wav");
+            fw.Save(musicSamples.leftChannelSamples, musicSamples.rightChannelSamples, samplingRate);
+
+            if(showDebugMessages) {
+                println(">>>  Finished generating and saving music sequence... ");
+                println(">>>  Start playing the generated music sequence... ");
+            }
+
+            writingMusic = false;
+
+            masterAudioPlayer = minim.loadFile("allmusic.wav");
+            masterAudioPlayer.play();
+
+            playingMusic = true;
+
+            if(showDebugMessages) {
+                println(">>>  Finished playing the genereated music sequence... ");
+            }
+        } catch(Exception e) {
+            println(e);
+        } finally {
+            writingMusic = false;
+        }
+    }
+}
+
+
+public void getMidiChannelsInfo(File selection) {
+    if (selection != null) {
+        writingMusic = true; // So other things don't interrupt the process
+
+        String filePath = selection.getAbsolutePath();
+
+            println();
+            println(">>>  Please wait, Reading Midi File");
+
+        File f = new File(filePath); // Load the selected MIDI file
+
+        int generatingStartTime = millis();
+
+        try {
+            javax.sound.midi.Sequence MIDISequence = MidiSystem.getSequence(f); // Convert the loaded file into MIDI object
+
+            int tickPerBeat = MIDISequence.getResolution();
+
+            // Get the tracks
+            Track[] tracks = MIDISequence.getTracks();
+           
+
+            // Show some information before the generation starts
+            if(showDebugMessages) {
+                println("Music duration:" + MIDISequence.getMicrosecondLength() / 1000000 + "s");
+                println("Tick per beat:" + tickPerBeat);
+                println("Number of tracks:" + tracks.length);
+            }
+
+            // Create a new MusicGenerator
+            MidiInfoGenerator info = new MidiInfoGenerator(MIDISequence.getTracks());
+            Thread thread = new Thread(info);
+            thread.start();
+            thread.join();
+            
+            int generatingDuration = millis() - generatingStartTime;
+            println("Generated the channelInfo in " + generatingDuration / 1000.0 + "s" + info.channelCount);
 
             // After all the notes have been added at the correct starting times
             if(showDebugMessages) {

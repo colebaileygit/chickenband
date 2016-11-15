@@ -55,6 +55,7 @@ class TrackGenerator implements Runnable {
 
                     // Read the details of the note on command
                     int channel = sm.getChannel();
+                    println(channel);
                     int pitch = sm.getData1();
                     float frequency = MIDIPitchToFreq(pitch);
                     float amp = sm.getData2() / 127.0;

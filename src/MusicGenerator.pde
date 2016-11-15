@@ -6,7 +6,6 @@ class MusicGenerator implements Runnable {
     private int endTime;
     private float tickDuration;
     private int samplingRate;
-
     // Constructor
     MusicGenerator(Track[] tracks, Sound[] sounds, int startTime, int endTime, float tickDuration, int samplingRate) {
         this.tracks = tracks;
