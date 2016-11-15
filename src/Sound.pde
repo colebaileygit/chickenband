@@ -31,10 +31,13 @@ class Sound {
     
     public int getId() { return id; }
     public int[] getPostProcessingEffects() { return ppEffects; }
-    public float getFundamentalFrequency() { return fundamentalFrequency; }
-    public float getRelativeVolume() { return relativeVolume; }
+    public float getFundamentalFrequency() { return getFundamentalFrequency(0f); }
+    public float getFundamentalFrequency(float frequency) { return fundamentalFrequency; }
+    public float getRelativeVolume() { return getRelativeVolume(0f); }
+    public float getRelativeVolume(float frequency) { return relativeVolume; }
     public float getStereoPosition() { return stereoPosition; }
-    public String getFilepath() { return filepath; }
+    public String getFilepath() { return getFilepath(0f); }
+    public String getFilepath(float frequency) { return filepath; }
     public float getFactor(float desiredFrequency) {
        return fundamentalFrequency / desiredFrequency; 
     }
@@ -43,21 +46,32 @@ class Sound {
 
 // add relevant metadata for each sound 'int' here.
 static class SoundDataMappings {
-   public static int PIANO = 1;
+   public static final int PIANO = 1;
+   public static final int GUITAR = 2;
+   public static final int BASS = 3;
+   public static final int BRASS = 4;
+   
+   
+   
    public static int[] postprocessingMapping(int id) {
      switch (id) {
-       
+         case PIANO: return new int[] { 2 }; 
+         default: return new int[] { 2 }; 
      }
-       return new int[] { 0 }; 
+       
     }
     
     public static float frequencyMapping(int id) {
-       return 525f; 
+      switch (id) {
+         case PIANO: return 525f;
+         default: return 525f;
+      }
     }
     
     public static String filepathMapping(int id) {
         switch (id) {
-           case 1: return "../chickenband/res/sounds/eC1.wav";
+           case PIANO: return "../chickenband/res/sounds/eC1.wav";
+           //case GUITAR:...
            default: return "../chickenband/res/sounds/eC1.wav";
         }
     } 
