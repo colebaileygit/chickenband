@@ -430,7 +430,7 @@ void setup() {
 
     // Create a button and put it near the right-Bottom corner
     cp5.addButton(cp5, "getMidiChannelsInfo", "Select Midi, convert it", 1)
-    .setPosition(width - 320, lowerBound + gapPlot + 4.5 * gapControls)
+    .setPosition(width - 320, lowerBound + gapPlot + 6 * gapControls)
     .setSize(300, 30)
     .setColorBackground(normal)
     .setColorForeground(highlighted)
@@ -884,7 +884,7 @@ public void generateMusic(File selection) {
         String filePath = selection.getAbsolutePath();
         Sound[] sounds = new Sound[16];
         for (int i = 0; i < sounds.length; i++) {
-           sounds[i] = null; 
+           sounds[i] = new Sound(1); 
         }
         sounds[4] = new Sound(1);
    //     int[] sounds = {0, 24, 12, 0, 1, 0, 8, 0, 10, 0, 0, 0, 0, 0, 0, 0};

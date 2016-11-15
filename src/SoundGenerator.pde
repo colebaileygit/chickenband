@@ -1,5 +1,6 @@
 import be.tarsos.dsp.*;
 import be.tarsos.dsp.io.jvm.*;
+import java.util.Arrays;
 
 
 class SoundGenerator implements Runnable {
@@ -81,9 +82,8 @@ class SoundGenerator implements Runnable {
         final float[] data = reader.getData();
         
         // simply reduce sound to required duration (maybe use time shifting in the future..)
-        int totalSamples = int(samplingRate * duration);
-        final float[] samples = new float[totalSamples];
-        System.arraycopy(data, 0, samples, 0, samples.length);
+        final int totalSamples = int(samplingRate * duration);
+        final float[] samples = Arrays.copyOf(data, totalSamples);
         
         float d1 = samplingRate;
         float d2 = factor; // Factor
@@ -110,9 +110,11 @@ class SoundGenerator implements Runnable {
                 float[] results = new float[2 * samples.length];
                 @Override
                 public boolean process(AudioEvent event) {
+                    if (count > totalSamples - 1) return true;
                     float[] eventResults = event.getFloatBuffer();
-                    System.arraycopy(eventResults, 0, results, count, eventResults.length);
-                    count += eventResults.length;
+                    int copySize = Math.min(eventResults.length, totalSamples);
+                    System.arraycopy(eventResults, 0, results, count, copySize);
+                    count += copySize;
                     return true;
                 }
                 
@@ -121,12 +123,12 @@ class SoundGenerator implements Runnable {
                    println("Processing complete");
                     float[] finalResults = new float[count];
                     System.arraycopy(results, 0, finalResults, 0, count);
-                    soundSamples.leftChannelSamples = new float[finalResults.length];
-                    soundSamples.rightChannelSamples = new float[finalResults.length];
+                    soundSamples.leftChannelSamples = Arrays.copyOf(finalResults, totalSamples);
+                    soundSamples.rightChannelSamples = Arrays.copyOf(finalResults, totalSamples);
                     
-                    for (int i = 0; i < finalResults.length; i++) {
-                       soundSamples.leftChannelSamples[i] = amplitude * finalResults[i]; 
-                       soundSamples.rightChannelSamples[i] = amplitude * finalResults[i];
+                    for (int i = 0; i < totalSamples; i++) {
+                       soundSamples.leftChannelSamples[i] = amplitude * soundSamples.leftChannelSamples[i]; 
+                       soundSamples.rightChannelSamples[i] = soundSamples.leftChannelSamples[i];
                     }
                  }
             });

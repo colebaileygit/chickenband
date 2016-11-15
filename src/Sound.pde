@@ -43,15 +43,22 @@ class Sound {
 
 // add relevant metadata for each sound 'int' here.
 static class SoundDataMappings {
+   public static int PIANO = 1;
    public static int[] postprocessingMapping(int id) {
+     switch (id) {
+       
+     }
        return new int[] { 0 }; 
     }
     
     public static float frequencyMapping(int id) {
-       return 256f; 
+       return 525f; 
     }
     
     public static String filepathMapping(int id) {
-       return "../chickenband/src/sounds/C1.wav"; 
+        switch (id) {
+           case 1: return "../chickenband/res/sounds/eC1.wav";
+           default: return "../chickenband/res/sounds/eC1.wav";
+        }
     } 
 }
