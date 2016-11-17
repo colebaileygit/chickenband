@@ -13,14 +13,12 @@ class WavFileReader {
        short[] samples = wave.getSampleAmplitudes();
        float[] result = new float[samples.length];
        // perform boost to reduce sound to [-1,1]
-       float maxValue = 0f;
-       for (int i = 0; i < samples.length; i++) {
-          float val = (float) abs(samples[i]);
-          if (val > maxValue) maxValue = val;
-       }
+       float maxValue = Short.MIN_VALUE * -1f;
+       
+       println("Max value is " + maxValue);
        
        for (int i = 0; i < samples.length; i++) {
-          result[i] = samples[i] / maxValue; 
+          result[i] = float(samples[i]) / maxValue; 
        }
        
        return result;

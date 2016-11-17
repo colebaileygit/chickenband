@@ -46,16 +46,29 @@ class Sound {
 
 // add relevant metadata for each sound 'int' here.
 static class SoundDataMappings {
+   public static final int DRUMS = 0; // special case..
+  
    public static final int PIANO = 1;
    public static final int GUITAR = 2;
    public static final int BASS = 3;
    public static final int BRASS = 4;
+   
+   public static final int KICK_DRUM = 5;
+   public static final int SNARE_DRUM = 6;
+   public static final int HI_HAT = 7;
+   public static final int CRASH = 8;
    
    
    
    public static int[] postprocessingMapping(int id) {
      switch (id) {
          case PIANO: return new int[] { 2 }; 
+         
+         case KICK_DRUM: return new int[] { 2, 7 };
+         case SNARE_DRUM: return new int[] { 2, 7 };
+         case HI_HAT: return new int[] { 2, 7 };
+         case DRUMS: return new int[] { 0 };
+         case CRASH: return new int[] { 2, 7 };
          default: return new int[] { 2 }; 
      }
        
@@ -64,6 +77,11 @@ static class SoundDataMappings {
     public static float frequencyMapping(int id) {
       switch (id) {
          case PIANO: return 525f;
+         
+         case KICK_DRUM: return 0f;
+         case SNARE_DRUM: return 0f;
+         case HI_HAT: return 0f;
+         case CRASH: return 0f;
          default: return 525f;
       }
     }
@@ -71,8 +89,12 @@ static class SoundDataMappings {
     public static String filepathMapping(int id) {
         switch (id) {
            case PIANO: return "../chickenband/res/sounds/eC1.wav";
+           case KICK_DRUM: return "../chickenband/res/sounds/kick.wav";
+           case SNARE_DRUM: return "../chickenband/res/sounds/snare.wav";
+           case HI_HAT: return "../chickenband/res/sounds/hihat.wav";
+           case CRASH: return "../chickenband/res/sounds/eC1.wav";
            //case GUITAR:...
-           default: return "../chickenband/res/sounds/eC1.wav";
+           default: return "";
         }
     } 
 }

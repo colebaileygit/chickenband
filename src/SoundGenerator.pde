@@ -78,6 +78,7 @@ class SoundGenerator implements Runnable {
     
     
     public AudioSamples generateSound(String filepath, final float amplitude, float factor, float duration) {
+        if (filepath == null || filepath == "") return soundSamples;
         WavFileReader reader = new WavFileReader(filepath);
         final float[] data = reader.getData();
         
@@ -89,6 +90,12 @@ class SoundGenerator implements Runnable {
         float d2 = factor; // Factor
         if (d2 < 0.1f) d2 = 0.1f;
         if (d2 > 4.0f) d2 = 4.0f;
+        
+        if (d2 == 1f) {  // if no pitch shift needed, return.
+           soundSamples.leftChannelSamples = samples;
+           soundSamples.rightChannelSamples = Arrays.copyOf(samples, totalSamples);
+           return soundSamples;
+        }
         
         RateTransposer localRateTransposer = new RateTransposer(d2);
         WaveformSimilarityBasedOverlapAdd localWaveformSimilarityBasedOverlapAdd = new WaveformSimilarityBasedOverlapAdd(WaveformSimilarityBasedOverlapAdd.Parameters.musicDefaults(d2, d1));
@@ -148,15 +155,15 @@ class SoundGenerator implements Runnable {
 
     // This function generates an individual sound, using the paramters passed into the constructor
     public AudioSamples generateSound() {
-        return this.generateSound(sound.getFilepath(), amplitude, sound.getFactor(frequency), duration);
+        return this.generateSound(sound, amplitude, frequency, duration);
     }
 
     public AudioSamples generateSound(Sound sound, float amplitude, float frequency) {
-        return this.generateSound(sound.getFilepath(), amplitude, sound.getFactor(frequency), duration);
+        return this.generateSound(sound.getFilepath(frequency), amplitude, sound.getFactor(frequency), duration);
     }
     
     public AudioSamples generateSound(Sound sound, float amplitude, float frequency, float duration) {
-       return this.generateSound(sound.getFilepath(), amplitude, sound.getFactor(frequency), duration); 
+       return this.generateSound(sound.getFilepath(frequency), amplitude, sound.getFactor(frequency), duration); 
     }
 
     //// This function generates an individual sound

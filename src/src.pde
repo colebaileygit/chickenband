@@ -884,9 +884,11 @@ public void generateMusic(File selection) {
         String filePath = selection.getAbsolutePath();
         Sound[] sounds = new Sound[16];
         for (int i = 0; i < sounds.length; i++) {
-           sounds[i] = new Sound(SoundDataMappings.PIANO); 
+           sounds[i] = new DrumSound(); 
         }
-        sounds[4] = new Sound(SoundDataMappings.BASS);
+        sounds[9] = new DrumSound();
+        sounds[10] = new DrumSound();
+   //     sounds[4] = new Sound(SoundDataMappings.PIANO);
    //     int[] sounds = {0, 24, 12, 0, 1, 0, 8, 0, 10, 0, 0, 0, 0, 0, 0, 0};
    //     int[] sounds = {0, 24,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         //float[] vols = {0, 1.3,  1, 0.3, 0.4, 0, 0.3, 0, 0.3, 0, 0, 0, 0, 0, 0, 0};
