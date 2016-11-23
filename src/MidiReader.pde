@@ -2,11 +2,13 @@ class MidiReader implements Runnable {
 
   private Track track; // MIDI track
   private Map<Track, Map<Integer, Integer>> channels;
+  private Map<Track, Integer> instrumentNumbers; 
 
   // Constructor
-  MidiReader(Track track, Map<Track, Map<Integer, Integer>> channels) {
+  MidiReader(Track track, Map<Track, Map<Integer, Integer>> channels, Map<Track, Integer> instrumentNumbers) {
     this.track = track;
     this.channels = channels;
+    this.instrumentNumbers = instrumentNumbers;
   }
 
   public void run() {
@@ -18,7 +20,10 @@ class MidiReader implements Runnable {
         ShortMessage sm = (ShortMessage)(m);
 
         // Find all note on
-        if (sm.getCommand() == ShortMessage.NOTE_ON && sm.getData2() != 0) {
+        if (sm.getCommand() == ShortMessage.PROGRAM_CHANGE) {
+          int instrument = sm.getData1();
+          instrumentNumbers.put(track, instrument);
+        } else if (sm.getCommand() == ShortMessage.NOTE_ON && sm.getData2() != 0) {
 
           // Read the details of the note on command
           int channel = sm.getChannel();
