@@ -53,6 +53,9 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collections;
+import java.util.Set;
+import java.util.HashSet;
 
 import javax.sound.midi.Instrument;
 import javax.sound.midi.InvalidMidiDataException;
@@ -1132,17 +1135,85 @@ public void getMidiChannelsInfo(File selection) {
       thread.start();
       thread.join();
 
+      Set<Integer> list1 = new HashSet();
+      for (int i=0; i<tracks.length; i++) {
+        for (Map.Entry<Track, Map<Integer, Integer>> entry : info.channelCount.entrySet()) {
+          list1.addAll(entry.getValue().values());
+        }
+      }
+      List<Integer> list = new ArrayList(list1);
+
+      Collections.sort(list);
+      Collections.reverse(list);
+
+      Sound[] sounds = new Sound[tracks.length];
+
       println(info.channelCount);
       println(info.instruments);
+      println(list);
+      for (int i=0; i<tracks.length; i++) {
+        Map<Integer, Integer> map = info.channelCount.get(tracks[i]);
+        if (map!=null) {
+          for (int j=0; j<5; j++) {
+            if (map.values().contains(list.get(j))) {
 
-      int generatingDuration = millis() - generatingStartTime;
-      println("Generated the channelInfo in " + generatingDuration / 1000.0 + "s" + info.channelCount);
+              List<Integer> keys = new ArrayList(map.keySet());
+              if (keys.get(0) == 9) {
+                sounds[i] = new Sound(0);
+                println("Track "+i+"channel : "+keys.get(0)+":gets bucket 0:"+sounds[i]);
+              } else {
+                int key = info.instruments.get(tracks[i]);
+                int val = getBucketInstrumentId(key);
+                if (val!=-1) {
+                  sounds[i] = new Sound(val);
+                  println("Track "+i+"channel : "+keys.get(0)+"instrument "+key+":gets bucket "+val+":"+sounds[i]);
+                }
+              }
+            }
+          }
+        }
+      }
     } 
     catch(Exception e) {
-      println(e);
+      e.printStackTrace();
     } 
     finally {
       writingMusic = false;
     }
   }
+}
+
+public Integer getBucketInstrumentId(Integer id) {
+  int val = id+1;
+  if (val<9)
+    return 1;
+  if (val<17)
+    return 2;
+  if (val<25)
+    return 3;
+  if (val<33)
+    return 4; 
+  if (val<41)
+    return 5;
+  if (val<49)
+    return 6; 
+  if (val<57)
+    return 7;
+  if (val<65)
+    return 8; 
+  if (val<73)
+    return 9;
+  if (val<81)
+    return 10; 
+  if (val<89)
+    return 11;
+  if (val<97)
+    return 12;
+  if (val<105)
+    return 13;
+  if (val<113)
+    return 14;
+  if (val<120)
+    return 15;
+  return -1;
 }
