@@ -988,23 +988,6 @@ public void generateMusic(File selection) {
 
     // create array of sounds for the selected file here.
     String filePath = selection.getAbsolutePath();
-    Sound[] sounds = new Sound[16];
-    for (int i = 0; i < sounds.length; i++) {
-      sounds[i] = new DrumSound();
-    }
-    sounds[9] = new DrumSound();
-    sounds[10] = new DrumSound();
-    //     sounds[4] = new Sound(SoundDataMappings.PIANO);
-    //     int[] sounds = {0, 24, 12, 0, 1, 0, 8, 0, 10, 0, 0, 0, 0, 0, 0, 0};
-    //     int[] sounds = {0, 24,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    //float[] vols = {0, 1.3,  1, 0.3, 0.4, 0, 0.3, 0, 0.3, 0, 0, 0, 0, 0, 0, 0};
-
-    //int[][] pps = {
-    //    {2, 0, 7}, {5, 10}, {5, 10, 2}, {5, 10, 2, 8}, {5, 10, 2}, {2, 0, 7},
-    //    {5, 10, 2, 4}, {2, 0, 7}, {5, 10, 2, 9}, {2, 0, 7}, {2, 0, 7}, {2, 0, 7},
-    //    {2, 0, 7}, {2, 0, 7}, {2, 0, 7}, {2, 0, 7}
-    //};
-    //float[] stereoPositions = {0.5, 0.55, 0.45, 0.2, 0.4, 0.5, 0.5, 0.5, 0.6, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5};
 
     int startTime = 0; // Where to begin (in seconds)
     int endTime = 260; // Where to end (in seconds)
@@ -1030,6 +1013,8 @@ public void generateMusic(File selection) {
 
       // Get the tracks
       Track[] tracks = MIDISequence.getTracks();
+      
+      Sound[] sounds = getTrackInfo(tracks, tickPerBeat, MIDISequence.getMicrosecondLength());
 
 
       // Show some information before the generation starts
@@ -1121,16 +1106,29 @@ public void getMidiChannelsInfo(File selection) {
       // Get the tracks
       Track[] tracks = MIDISequence.getTracks();
 
+      getTrackInfo(tracks, tickPerBeat, MIDISequence.getMicrosecondLength());
+      
+    } 
+    catch(Exception e) {
+      e.printStackTrace();
+    } 
+    finally {
+      writingMusic = false;
+    }
+  }
+}
 
-      // Show some information before the generation starts
+private Sound[] getTrackInfo(Track[] tracks, int tickPerBeat, float microsecondLength) {
+  try {
+    // Show some information before the generation starts
       if (showDebugMessages) {
-        println("Music duration:" + MIDISequence.getMicrosecondLength() / 1000000 + "s");
+        println("Music duration:" + microsecondLength / 1000000 + "s");
         println("Tick per beat:" + tickPerBeat);
         println("Number of tracks:" + tracks.length);
       }
 
       // Create a new MusicGenerator
-      MidiInfoGenerator info = new MidiInfoGenerator(MIDISequence.getTracks());
+      MidiInfoGenerator info = new MidiInfoGenerator(tracks);
       Thread thread = new Thread(info);
       thread.start();
       thread.join();
@@ -1154,32 +1152,30 @@ public void getMidiChannelsInfo(File selection) {
       for (int i=0; i<tracks.length; i++) {
         Map<Integer, Integer> map = info.channelCount.get(tracks[i]);
         if (map!=null) {
-          for (int j=0; j<5; j++) {
+          for (int j=0; j<5 && j<list.size(); j++) {
             if (map.values().contains(list.get(j))) {
 
               List<Integer> keys = new ArrayList(map.keySet());
               if (keys.get(0) == 9) {
-                sounds[i] = new Sound(0);
+                sounds[i] = new DrumSound();
                 println("Track "+i+"channel : "+keys.get(0)+":gets bucket 0:"+sounds[i]);
               } else {
                 int key = info.instruments.get(tracks[i]);
                 int val = getBucketInstrumentId(key);
                 if (val!=-1) {
                   sounds[i] = new Sound(val);
-                  println("Track "+i+"channel : "+keys.get(0)+"instrument "+key+":gets bucket "+val+":"+sounds[i]);
+                  println("Track "+i+" channel : "+keys.get(0)+" instrument: "+key+" gets bucket: "+val+":"+sounds[i]);
                 }
               }
             }
           }
         }
       }
-    } 
-    catch(Exception e) {
-      e.printStackTrace();
-    } 
-    finally {
-      writingMusic = false;
-    }
+      
+      return sounds;
+  } catch (InterruptedException e) {
+    e.printStackTrace();
+     return new Sound[16]; 
   }
 }
 
