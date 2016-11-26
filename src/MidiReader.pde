@@ -12,6 +12,7 @@ class MidiReader implements Runnable {
   }
 
   public void run() {
+    boolean instrumentFound = false;
     // Read every MIDI event and handle all note on
     for (int i = 0; i < track.size(); ++i) {
       MidiEvent e = track.get(i);
@@ -23,6 +24,7 @@ class MidiReader implements Runnable {
         if (sm.getCommand() == ShortMessage.PROGRAM_CHANGE) {
           int instrument = sm.getData1();
           instrumentNumbers.put(track, instrument);
+          instrumentFound = true;
         } else if (sm.getCommand() == ShortMessage.NOTE_ON && sm.getData2() != 0) {
 
           // Read the details of the note on command

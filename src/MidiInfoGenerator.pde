@@ -11,6 +11,11 @@ class MidiInfoGenerator implements Runnable {
   // Constructor
   MidiInfoGenerator(Track[] tracks) {
     this.tracks = tracks;
+    
+    // set default instrument number to grand piano (0) for every track to avoid null pointer exception when instrument not specified.
+    for (Track t : tracks) {
+       instruments.put(t, 0); 
+    }
   }
 
   public void run() {

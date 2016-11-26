@@ -60,7 +60,7 @@ class TrackGenerator implements Runnable {
                     float amp = sm.getData2() / 127.0;
                     float duration = 0;
                     
-                    println("Playing pitch " + pitch);
+               //     println("Playing pitch " + pitch);
 
                     // Search for the corresponding note off event
                     for(int j = i + 1; j < track.size(); ++j) {

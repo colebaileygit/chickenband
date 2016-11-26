@@ -130,7 +130,7 @@ static class SoundDataMappings {
   public static String filepathMapping(int id) {
     switch (id) {
     case PIANO: 
-      return "../chickenband/res/sounds/eC1.wav";
+      return "../chickenband/res/sounds/piano.wav";
     case KICK_DRUM: 
       return "../chickenband/res/sounds/kick.wav";
     case SNARE_DRUM: 
