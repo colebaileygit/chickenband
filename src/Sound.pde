@@ -121,7 +121,7 @@ static class SoundDataMappings {
   public static float frequencyMapping(int id) {
     switch (id) {
     case PIANO: 
-      return 525f;
+      return 773f;
     case ENSEMBLE:
     case STRINGS:
       return 504f;

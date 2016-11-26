@@ -86,16 +86,34 @@ class SoundGenerator implements Runnable {
         final int totalSamples = int(samplingRate * duration);
         final float[] samples = Arrays.copyOf(data, totalSamples);
         
-        float d1 = samplingRate;
-        float d2 = factor; // Factor
-        if (d2 < 0.1f) d2 = 0.1f;
-        if (d2 > 4.0f) d2 = 4.0f;
+        soundSamples = shiftSamples(samples, factor, totalSamples);
         
-        if (d2 == 1f) {  // if no pitch shift needed, return.
-           soundSamples.leftChannelSamples = samples;
-           soundSamples.rightChannelSamples = Arrays.copyOf(samples, totalSamples);
+        for (int i = 0; i < totalSamples; i++) {
+           soundSamples.leftChannelSamples[i] = amplitude * soundSamples.leftChannelSamples[i]; 
+           soundSamples.rightChannelSamples[i] = soundSamples.leftChannelSamples[i];
+        }
+                    
+        return soundSamples;
+    }
+    
+    private AudioSamples shiftSamples(float[] input, float factor, final int totalSamples) {
+       float d1 = samplingRate;
+        float d2 = factor; // Factor
+        if (d2 < 0.1f) {
+           AudioSamples oneShift = shiftSamples(input, d2 / 0.1f, totalSamples);
+           input = oneShift.leftChannelSamples;
+           d2 = 0.1f;
+        } else if (d2 > 4.0f) {
+            AudioSamples oneShift = shiftSamples(input, d2 / 4.0f, totalSamples);
+           input = oneShift.leftChannelSamples;
+           d2 = 4.0f;
+        } else if (d2 == 1f) {  // if no pitch shift needed, return.
+           soundSamples.leftChannelSamples = input;
+           soundSamples.rightChannelSamples = Arrays.copyOf(input, totalSamples);
            return soundSamples;
         }
+        
+        final float[] samples = input;
         
         RateTransposer localRateTransposer = new RateTransposer(d2);
         WaveformSimilarityBasedOverlapAdd localWaveformSimilarityBasedOverlapAdd = new WaveformSimilarityBasedOverlapAdd(WaveformSimilarityBasedOverlapAdd.Parameters.musicDefaults(d2, d1));
@@ -132,11 +150,6 @@ class SoundGenerator implements Runnable {
                     System.arraycopy(results, 0, finalResults, 0, count);
                     soundSamples.leftChannelSamples = Arrays.copyOf(finalResults, totalSamples);
                     soundSamples.rightChannelSamples = Arrays.copyOf(finalResults, totalSamples);
-                    
-                    for (int i = 0; i < totalSamples; i++) {
-                       soundSamples.leftChannelSamples[i] = amplitude * soundSamples.leftChannelSamples[i]; 
-                       soundSamples.rightChannelSamples[i] = soundSamples.leftChannelSamples[i];
-                    }
                  }
             });
             Thread thread = new Thread(localAudioDispatcher);
@@ -149,7 +162,7 @@ class SoundGenerator implements Runnable {
            println(e.toString()); 
         }
         
-        return soundSamples;
+        return soundSamples; 
     }
     
 
