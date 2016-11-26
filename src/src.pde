@@ -992,7 +992,7 @@ public void generateMusic(File selection) {
     int startTime = 0; // Where to begin (in seconds)
      // Where to end (in seconds)
 
-    int beatPerMinute = 145;
+    int beatPerMinute = 120;
     int microTempo = 6000000 / beatPerMinute; // Default: 50000 for tempo 120;
     float beatDuration = 60.0 / beatPerMinute;
 
@@ -1156,7 +1156,7 @@ private Sound[] getTrackInfo(Track[] tracks, int tickPerBeat, float microsecondL
       for (int i=0; i<tracks.length; i++) {
         Map<Integer, Integer> map = info.channelCount.get(tracks[i]);
         if (map!=null) {
-          for (int j=0; j<5 && j<list.size(); j++) {
+          for (int j=0; j<10 && j<list.size(); j++) {
             if (map.values().contains(list.get(j))) {
 
               List<Integer> keys = new ArrayList(map.keySet());

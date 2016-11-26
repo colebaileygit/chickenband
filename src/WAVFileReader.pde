@@ -15,7 +15,7 @@ class WavFileReader {
        // perform boost to reduce sound to [-1,1]
        float maxValue = Short.MIN_VALUE * -1f;
        
-       println("Max value is " + maxValue);
+  //     println("Max value is " + maxValue);
        
        for (int i = 0; i < samples.length; i++) {
           result[i] = float(samples[i]) / maxValue; 

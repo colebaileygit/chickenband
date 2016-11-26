@@ -72,15 +72,16 @@ static class SoundDataMappings {
   public static final int GUITAR = 4;
   public static final int BASS = 5;
   public static final int STRINGS =6;
-  public static final int BRASS = 7;
-  public static final int REED=8;
-  public static final int  PIPE=9;
-  public static final int  SYNTH_LEAD=10;
-  public static final int SYNTH_PAD=11;
-  public static final int  SYNTH_EFFECTS=12;
-  public static final int  ETHNIC=13;
-  public static final int  PERCUSSIVE=14;
-  public static final int SOUND_EFFECTS=15;
+  public static final int ENSEMBLE = 7;
+  public static final int BRASS = 8;
+  public static final int REED=9;
+  public static final int  PIPE=10;
+  public static final int  SYNTH_LEAD=11;
+  public static final int SYNTH_PAD=12;
+  public static final int  SYNTH_EFFECTS=13;
+  public static final int  ETHNIC=14;
+  public static final int  PERCUSSIVE=15;
+  public static final int SOUND_EFFECTS=16;
 
   public static final int KICK_DRUM = 16;
   public static final int SNARE_DRUM = 17;
@@ -92,14 +93,16 @@ static class SoundDataMappings {
   public static int[] postprocessingMapping(int id) {
     switch (id) {
     case PIANO: 
-      return new int[] { 2 }; 
-
+      return new int[] { 2, 5, 10 }; // exponential decay (2), fade in (5), fade out (10)  
+    case ENSEMBLE:
+    case STRINGS:
+      return new int[] { 2 };
     case KICK_DRUM: 
-      return new int[] { 2, 7 };
+      return new int[] { 2, 7, 5, 10 };
     case SNARE_DRUM: 
       return new int[] { 2, 7 };
     case HI_HAT: 
-      return new int[] { 2, 7 };
+      return new int[] { 2, 7, 5, 10 };
     case DRUMS: 
       return new int[] { 0 };
     case CRASH: 
@@ -113,6 +116,9 @@ static class SoundDataMappings {
     switch (id) {
     case PIANO: 
       return 525f;
+     case ENSEMBLE:
+     case STRINGS:
+       return 504f;
 
     case KICK_DRUM: 
       return 0f;
@@ -131,6 +137,9 @@ static class SoundDataMappings {
     switch (id) {
     case PIANO: 
       return "../chickenband/res/sounds/piano.wav";
+    case ENSEMBLE:
+    case STRINGS:
+      return "../chickenband/res/sounds/string.wav";
     case KICK_DRUM: 
       return "../chickenband/res/sounds/kick.wav";
     case SNARE_DRUM: 
@@ -138,7 +147,7 @@ static class SoundDataMappings {
     case HI_HAT: 
       return "../chickenband/res/sounds/hihat.wav";
     case CRASH: 
-      return "../chickenband/res/sounds/eC1.wav";
+      return "../chickenband/res/sounds/crash.wav";
       //case GUITAR:...
     default: 
       return "";
