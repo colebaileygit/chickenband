@@ -1016,7 +1016,7 @@ public void generateMusic(File selection) {
       
       Sound[] sounds = getTrackInfo(tracks, tickPerBeat, MIDISequence.getMicrosecondLength());
 
-      int endTime = MIDISequence.getMicrosecondLength() / 1000000;
+      int endTime = (int)(MIDISequence.getMicrosecondLength() / 1000000);
       musicDuration = MIDISequence.getMicrosecondLength() / 1000000;
       // Show some information before the generation starts
       if (showDebugMessages) {
