@@ -988,7 +988,7 @@ public void generateMusic(File selection) {
 
     // create array of sounds for the selected file here.
     String filePath = selection.getAbsolutePath();
-
+    
     int startTime = 0; // Where to begin (in seconds)
      // Where to end (in seconds)
 
@@ -1017,6 +1017,7 @@ public void generateMusic(File selection) {
       Sound[] sounds = getTrackInfo(tracks, tickPerBeat, MIDISequence.getMicrosecondLength());
 
       int endTime = (int)(MIDISequence.getMicrosecondLength() / 1000000);
+      musicSamples = new AudioSamples(endTime - startTime, samplingRate);
       musicDuration = MIDISequence.getMicrosecondLength() / 1000000;
       // Show some information before the generation starts
       if (showDebugMessages) {
