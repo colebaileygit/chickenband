@@ -266,7 +266,7 @@ class AudioSamples {
             case(2): input = leftChannelSamples; input2 = rightChannelSamples; break;
         }
 
-        float fadeValue = 0.05;  // fade in duration, in seconds
+        float fadeValue = 0.15;  // fade in duration, in seconds
         if(!Float.isNaN(param1)) {
             fadeValue = param1;
         }

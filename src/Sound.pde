@@ -96,11 +96,11 @@ static class SoundDataMappings {
       return new int[] { 2, 5, 10 }; // exponential decay (2), fade in (5), fade out (10)  
     case ENSEMBLE:
     case STRINGS:
-      return new int[] { 2 };
+      return new int[] { 2, 5, 10 };
     case GUITAR:
-      return new int[] { 2 };
+      return new int[] { 2, 5, 10 };
     case BASS:
-      return new int[] { 2 };
+      return new int[] { 2, 5, 10 };
     case SYNTH_LEAD:
       return new int[] { 2 };
     case KICK_DRUM: 
