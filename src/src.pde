@@ -990,7 +990,7 @@ public void generateMusic(File selection) {
     String filePath = selection.getAbsolutePath();
 
     int startTime = 0; // Where to begin (in seconds)
-    int endTime = 260; // Where to end (in seconds)
+     // Where to end (in seconds)
 
     int beatPerMinute = 145;
     int microTempo = 6000000 / beatPerMinute; // Default: 50000 for tempo 120;
@@ -1016,7 +1016,7 @@ public void generateMusic(File selection) {
       
       Sound[] sounds = getTrackInfo(tracks, tickPerBeat, MIDISequence.getMicrosecondLength());
 
-
+      int endTime = MIDISequence.getMicrosecondLength() / 1000000;
       // Show some information before the generation starts
       if (showDebugMessages) {
         println("Music duration:" + MIDISequence.getMicrosecondLength() / 1000000 + "s");
@@ -1117,6 +1117,7 @@ public void getMidiChannelsInfo(File selection) {
     }
   }
 }
+
 
 private Sound[] getTrackInfo(Track[] tracks, int tickPerBeat, float microsecondLength) {
   try {
