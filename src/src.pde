@@ -1017,6 +1017,7 @@ public void generateMusic(File selection) {
       Sound[] sounds = getTrackInfo(tracks, tickPerBeat, MIDISequence.getMicrosecondLength());
 
       int endTime = MIDISequence.getMicrosecondLength() / 1000000;
+      musicDuration = MIDISequence.getMicrosecondLength() / 1000000;
       // Show some information before the generation starts
       if (showDebugMessages) {
         println("Music duration:" + MIDISequence.getMicrosecondLength() / 1000000 + "s");
@@ -1121,6 +1122,7 @@ public void getMidiChannelsInfo(File selection) {
 
 private Sound[] getTrackInfo(Track[] tracks, int tickPerBeat, float microsecondLength) {
   try {
+    musicDuration =  microsecondLength / 1000000;
     // Show some information before the generation starts
       if (showDebugMessages) {
         println("Music duration:" + microsecondLength / 1000000 + "s");
