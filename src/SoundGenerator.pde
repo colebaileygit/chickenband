@@ -106,7 +106,7 @@ class SoundGenerator implements Runnable {
         try {
             AudioDispatcher localAudioDispatcher;
             localAudioDispatcher = be.tarsos.dsp.io.jvm.AudioDispatcherFactory.fromFloatArray(samples, samplingRate, localWaveformSimilarityBasedOverlapAdd.getInputBufferSize(), localWaveformSimilarityBasedOverlapAdd.getOverlap());
-            println(samples.length + " input size");
+       //     println(samples.length + " input size");
        //     println(localAudioDispatcher.getFormat().toString());
             //localWaveformSimilarityBasedOverlapAdd.process(event);
             //localRateTransposer.process(event);

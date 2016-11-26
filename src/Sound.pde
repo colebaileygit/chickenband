@@ -97,6 +97,12 @@ static class SoundDataMappings {
     case ENSEMBLE:
     case STRINGS:
       return new int[] { 2 };
+    case GUITAR:
+      return new int[] { 2 };
+    case BASS:
+      return new int[] { 2 };
+    case SYNTH_LEAD:
+      return new int[] { 2 };
     case KICK_DRUM: 
       return new int[] { 2, 7, 5, 10 };
     case SNARE_DRUM: 
@@ -116,9 +122,15 @@ static class SoundDataMappings {
     switch (id) {
     case PIANO: 
       return 525f;
-     case ENSEMBLE:
-     case STRINGS:
-       return 504f;
+    case ENSEMBLE:
+    case STRINGS:
+      return 504f;
+    case GUITAR:
+      return 504f;
+    case BASS:
+      return 139f;
+    case SYNTH_LEAD:
+      return 525f;
 
     case KICK_DRUM: 
       return 0f;
@@ -140,6 +152,12 @@ static class SoundDataMappings {
     case ENSEMBLE:
     case STRINGS:
       return "../chickenband/res/sounds/string.wav";
+    case GUITAR:
+      return "../chickenband/res/sounds/guitar.wav";
+    case BASS:
+      return "../chickenband/res/sounds/bass.wav";
+    case SYNTH_LEAD:
+      return "../chickenband/res/sounds/eC1.wav";
     case KICK_DRUM: 
       return "../chickenband/res/sounds/kick.wav";
     case SNARE_DRUM: 
