@@ -20,7 +20,7 @@ class DrumSound extends Sound {
     private int determineDrum(float frequency) {
         int pitch = frequencyToPitch(frequency);
     //    println("frequency" + frequency);
-    //    println("pitch" + pitch);
+        println("pitch" + pitch);
         
         switch (pitch) {
            case 35:
@@ -51,7 +51,7 @@ class DrumSound extends Sound {
         int baseMIDIPitch = 21;
         float baseFrequency = 27.5;
         
-        float exponent = log(frequency / baseFrequency);
+        float exponent = log(frequency / baseFrequency) / log(2);
         
         return round(exponent * 12 + baseMIDIPitch);
     }

@@ -80,9 +80,12 @@ class TrackGenerator implements Runnable {
                             }
                         }
                     }
+                    
+               //     println(duration + " generating sound..");
 
                     // Ignore the note on if we cannot find the matching note off
-                    if(duration > 0 && duration / tickDuration > 10) {                        
+                    if(duration > 0/* && duration / tickDuration > 10*/) {  
+                        if (duration / tickDuration < 12) duration = 12 * tickDuration;
                         // Create a new SoundGenerator with parameters of this note
                         SoundGenerator sg = new SoundGenerator(sound, amp, frequency, duration, samplingRate);
                         AudioSamples ss = sg.generateSound();

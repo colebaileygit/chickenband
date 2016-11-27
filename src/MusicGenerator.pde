@@ -27,7 +27,6 @@ class MusicGenerator implements Runnable {
                 if (showDebugMessages) {
                     println(">>>  Track " + i + " is being generated.."); 
                 }
-
                 TrackGenerator trackGenerator = new TrackGenerator(tracks[i], sounds[i], startTime, endTime, tickDuration, samplingRate);
                 trackGenerators.add(trackGenerator);
 
