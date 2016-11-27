@@ -86,7 +86,13 @@ class SoundGenerator implements Runnable {
         final int totalSamples = int(samplingRate * duration);
         final float[] samples = Arrays.copyOf(data, totalSamples);
         
+    //    clippingDetection(samples, "initial");
+        
         soundSamples = shiftSamples(samples, factor, totalSamples);
+        //soundSamples.leftChannelSamples = samples;
+        //soundSamples.rightChannelSamples = samples;
+        
+   //     clippingDetection(soundSamples.leftChannelSamples, "postShift");
         
         for (int i = 0; i < totalSamples; i++) {
            soundSamples.leftChannelSamples[i] = amplitude * soundSamples.leftChannelSamples[i]; 
@@ -94,6 +100,29 @@ class SoundGenerator implements Runnable {
         }
                     
         return soundSamples;
+    }
+    
+    private void clippingDetection(float[] samples, String messageId) {
+      int clipCount = 0;
+      boolean started = false;
+        for (int i = 1000; i < samples.length; i++) {
+            if (!started) {
+                if (samples[i] > 1E-5) {
+                    started = true;
+                } else {
+                    continue;
+                }
+            }
+            
+            if (samples[i] < 1E-5) {
+               clipCount++; 
+            } else if (clipCount > (int) (.001 * samplingRate)) {
+               println("Clipping found! at sample " + i + ". " + messageId);
+               break;
+            } else {
+               clipCount = 0; 
+            }
+        }
     }
     
     private AudioSamples shiftSamples(float[] input, float factor, final int totalSamples) {
@@ -114,6 +143,13 @@ class SoundGenerator implements Runnable {
         }
         
         final float[] samples = input;
+        
+        //println("Shift factor = " + d2);
+        //float areaDuration = .215f - .205f;
+        //int areaSamples = (int)(areaDuration * samplingRate);
+        //float[] troubleArea = new float[areaSamples];
+        //System.arraycopy(samples, (int)(.205f * samplingRate), troubleArea, 0, areaSamples);
+        //println(Arrays.toString(troubleArea));
         
         RateTransposer localRateTransposer = new RateTransposer(d2);
         WaveformSimilarityBasedOverlapAdd localWaveformSimilarityBasedOverlapAdd = new WaveformSimilarityBasedOverlapAdd(WaveformSimilarityBasedOverlapAdd.Parameters.musicDefaults(d2, d1));
@@ -138,8 +174,25 @@ class SoundGenerator implements Runnable {
                     if (count > totalSamples - 1) return true;
                     float[] eventResults = event.getFloatBuffer();
                     int copySize = Math.min(eventResults.length, totalSamples);
-                    System.arraycopy(eventResults, 0, results, count, copySize);
-                    count += copySize;
+                    
+                    int trailingZeroes = 0;
+                    for (int i = eventResults.length - 1; i >= 0; i--) {
+                       if (eventResults[i] == 0) {
+                          trailingZeroes++; 
+                       } else {
+                           break;
+                       }
+                    }
+                    copySize -= trailingZeroes;
+                    if (copySize > 0) {
+                      System.arraycopy(eventResults, 0, results, count, copySize);
+                      count += copySize;
+                    }
+                    
+                    //float seconds = (float)copySize / samplingRate;
+                    //println("Added " + seconds + " s.");
+                    
+             //       println("Zeroes: " + trailingZeroes + ", samples " + copySize);
                     return true;
                 }
                 

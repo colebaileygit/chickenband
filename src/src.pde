@@ -93,7 +93,7 @@ int totalSoundNeedToBeGenerated = 19; // Total number of individual sounds that 
  (18) sound 4 multiply with sound 4
  (19) sound 5 multiply with sound 6
  ***/
-Sound sound = new Sound(1);
+Sound sound = new Sound(6);
 
 /***
  Post-processing of an individual sound:
@@ -1174,6 +1174,23 @@ private Sound[] getTrackInfo(Track[] tracks, int tickPerBeat, float microsecondL
             }
           }
         }
+      }
+      
+      // Swap piano with chicken piano if no other chicken sounds present
+      boolean convertToChicken = true;
+      for (Sound s : sounds) {
+         if (s != null && (s.id != SoundDataMappings.DRUMS && s.id != SoundDataMappings.PIANO)) {
+             convertToChicken = false;
+             break;
+         }
+      }
+      
+      if (convertToChicken) {
+         for (int i = 0; i < sounds.length; i++) {
+            if (sounds[i] != null && sounds[i].id == SoundDataMappings.PIANO) {
+               sounds[i] = new Sound(SoundDataMappings.CHICKEN_PIANO); 
+            }
+         }
       }
       
       return sounds;

@@ -66,6 +66,7 @@ static class SoundDataMappings {
   public static final int DRUMS = 0; // special case..
 
   public static final int PIANO = 1;
+  public static final int CHICKEN_PIANO = 21;
 
   public static final int CHROMATIC_PERCUSSION = 2;
   public static final int ORGAN = 3;
@@ -83,24 +84,25 @@ static class SoundDataMappings {
   public static final int  PERCUSSIVE=15;
   public static final int SOUND_EFFECTS=16;
 
-  public static final int KICK_DRUM = 16;
-  public static final int SNARE_DRUM = 17;
-  public static final int HI_HAT = 18;
-  public static final int CRASH = 19;
+  public static final int KICK_DRUM = 17;
+  public static final int SNARE_DRUM = 18;
+  public static final int HI_HAT = 19;
+  public static final int CRASH = 20;
 
 
 
   public static int[] postprocessingMapping(int id) {
     switch (id) {
+    case CHICKEN_PIANO:
     case PIANO: 
-      return new int[] { 2, 5, 10 }; // exponential decay (2), fade in (5), fade out (10)  
+      return new int[] { 0 /*, 5, 10*/ }; // exponential decay (2), fade in (5), fade out (10)  
     case ENSEMBLE:
     case STRINGS:
-      return new int[] { 2, 5, 10 };
+      return new int[] { 2, 2, 5, 10 };
     case GUITAR:
-      return new int[] { 2, 5, 10 };
+      return new int[] { 2, 2, 5, 10 };
     case BASS:
-      return new int[] { 2, 5, 10 };
+      return new int[] { 2, 2, 5, 10 };
     case SYNTH_LEAD:
       return new int[] { 2 };
     case KICK_DRUM: 
@@ -120,6 +122,8 @@ static class SoundDataMappings {
 
   public static float frequencyMapping(int id) {
     switch (id) {
+    case CHICKEN_PIANO:
+      return 525f;
     case PIANO: 
       return 773f;
     case ENSEMBLE:
@@ -147,8 +151,10 @@ static class SoundDataMappings {
 
   public static String filepathMapping(int id) {
     switch (id) {
-    case PIANO: 
+    case CHICKEN_PIANO:
       return "../chickenband/res/sounds/piano.wav";
+    case PIANO: 
+      return "../chickenband/res/sounds/piano1.wav";
     case ENSEMBLE:
     case STRINGS:
       return "../chickenband/res/sounds/string.wav";

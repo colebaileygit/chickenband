@@ -270,14 +270,23 @@ class AudioSamples {
         if(!Float.isNaN(param1)) {
             fadeValue = param1;
         }
+        
+        int totalRealSamples = totalSamples;
+        for (int i = input.length - 1; i >= 0; i--) {
+           if (input[i] == 0) {
+              totalRealSamples--; 
+           } else {
+               break;
+           }
+        }
 
-        int fadeSamples = int(totalSamples * fadeValue);
-        if (fadeSamples > totalSamples) {
-            fadeSamples = totalSamples; 
+        int fadeSamples = int(samplingRate * fadeValue);
+        if (fadeSamples > totalRealSamples) {
+            fadeSamples = totalRealSamples; 
         }
         
-        for (int i = totalSamples - fadeSamples; i < totalSamples; i++) {
-            float multiplier = float(totalSamples - i) / fadeSamples; 
+        for (int i = totalRealSamples - fadeSamples; i < totalRealSamples; i++) {
+            float multiplier = float(totalRealSamples - i) / fadeSamples; 
             input[i] = input[i] * multiplier;
             if (input2.length > 0) {
                input2[i] = input2[i] * multiplier; 
@@ -322,6 +331,7 @@ class AudioSamples {
             case(1): input = rightChannelSamples; break;
             case(2): input = leftChannelSamples; input2 = rightChannelSamples; break;
         }
+       
         
         if (Float.isNaN(amplitude)) {
             amplitude = lastUsedAmplitude;
@@ -332,7 +342,7 @@ class AudioSamples {
         // Find largest value
         float largestValue = 0.0;
         for (int i = 0; i < totalSamples; i++) {
-            float localLargestValue = input[i];
+            float localLargestValue = input[i];  
             if(input2.length > 0) {
                 localLargestValue = max(abs(input[i]), abs(input2[i]));
             }
