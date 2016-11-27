@@ -95,7 +95,7 @@ static class SoundDataMappings {
     switch (id) {
     case CHICKEN_PIANO:
     case PIANO: 
-      return new int[] { 0 /*, 5, 10*/ }; // exponential decay (2), fade in (5), fade out (10)  
+      return new int[] { 2 , 5, 10 }; // exponential decay (2), fade in (5), fade out (10)  
     case ENSEMBLE:
     case STRINGS:
       return new int[] { 2, 2, 5, 10 };
